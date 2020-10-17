@@ -71,6 +71,7 @@ function update(){
     }
     
     for(let i=0; i<recordsToUse.length; i++){
+        if(day < recordsToUse[i].arrestDay-10) day = recordsToUse[i].arrestDay-10;
         if(day == recordsToUse[i].arrestDay){
             let arrestee = getRandomPerson();
             arrestee.arrested = true;
