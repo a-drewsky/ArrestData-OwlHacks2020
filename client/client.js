@@ -18,8 +18,8 @@ let settings = {
     dayDelimiter: 10,
     loopTime: 400,
     minimumPersonSize: {
-        x: 3,
-        y: 6
+        x: Math.floor(canvas.width/600),
+        y: Math.floor(canvas.width/300)
     }
 }
 
