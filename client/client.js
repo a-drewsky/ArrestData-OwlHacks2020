@@ -1,7 +1,7 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
-canvas.width = innerWidth * 0.985;
+canvas.width = innerWidth - 25;
 canvas.height = innerHeight * 0.8;
 
 let settings = {
