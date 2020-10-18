@@ -98,8 +98,6 @@ function update() {
     //based on days arrested
     //if days after arrest is less than 100, influence += 100 - (days after arrest/20) 
 
-
-
     //everyone affects friends
     //half of influence level
 
@@ -167,6 +165,7 @@ function draw() {
 
     ctx.globalAlpha = 0.4;
 
+    //draw images
     for(let i=0; i<canvas.width; i+=300){
         ctx.drawImage(cityImg, i, -20, 300, 100);
     }
@@ -180,6 +179,7 @@ function draw() {
 
     let inJail = 0;
 
+    //draw population
     for (let i in population) {
         if (!population[i].arrested) {
             let position = Math.floor(population[i].position);
@@ -204,12 +204,6 @@ function draw() {
             drawPerson(settings.bottomBuffer + settings.barSpacing * inJail + (settings.barSpacing - settings.jailPersonSize.x) / 2, settings.bottomPos + settings.bottomBuffer - (settings.jailPersonSize.y - (canvas.height - settings.bottomBuffer - settings.bottomPos)) / 2, population[i].influence, true);
             inJail++;
         }
-        // x += settings.personSize.x + settings.buffer;
-
-        // if (x > canvas.width - settings.personSize.x - settings.buffer) {
-        //     x = settings.buffer;
-        //     y += settings.personSize.y + settings.buffer;
-        // }
     }
     drawJail();
 }
