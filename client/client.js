@@ -16,7 +16,11 @@ let settings = {
     bottomBuffer: 10,
     barSpacing: 40,
     dayDelimiter: 10,
-    loopTime: 400
+    loopTime: 400,
+    minimumPersonSize: {
+        x: 3,
+        y: 6
+    }
 }
 
 
@@ -66,6 +70,11 @@ function restartSimulation() {
     settings.personSize = {
         x: 6000 / settings.populationCount,
         y: 12000 / settings.populationCount
+    }
+
+    if(settings.personSize.x<settings.minimumPersonSize.x || settings.personSize.y<settings.minimumPersonSize.y){
+        settings.personSize.x = settings.minimumPersonSize.x;
+        settings.personSize.y = settings.minimumPersonSize.y;
     }
 
     populate();
