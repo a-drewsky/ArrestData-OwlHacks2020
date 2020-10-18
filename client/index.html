@@ -1,20 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arrest Population</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="module" src="client/client.js" defer></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <style>
-    body{
-        overflow: hidden;
+    body {
+        overflow-x: hidden;
         padding: 0;
         margin: 0;
     }
 </style>
+
 <body>
-    <canvas id="canvas" oncontextmenu="return false"></canvas>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mt-5">Sphere of Incarceration</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <p class="mt-4">
+                    Incarceration impacts much more than just the arrestee. In reality, this effects the whole
+                    community.
+                    When someone is incarcerated and can't post bail, it impacts that persons friends and seriously
+                    impacts there family.
+                    In this simulation, each person has a normal distribution of family members based on census data and
+                    a normal distribution of friends with a mean of 5.
+                    When someone is arrested this directly impacts the negitive influence on their family and each
+                    person with negative influence also slightly impacts the negative influence of their friends.
+                    <br /><br />
+                    The negative influence a person has is visualized by how red they are. The more negative influence a
+                    person has, the slower they will be at completing their daily routine.
+                    This simulation shows just how many people are negatively impacted when someone is arrested and is
+                    unable to post bail.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="canvas" oncontextmenu="return false" class="border mt-5 ml-1"></canvas>
+
+    <div class="container mt-4">
+        <div class="row d-flex justify-content-center">
+            <div class="col-6 p-0 pr-1 d-flex justify-content-end">
+                <input type="number" id="txtPopulation" placeholder="Population (200-4000)" class="w-50">
+            </div>
+            <div class="col-6 p-0">
+                <button type="button" class="btn btn-info" id="btnRestart">Restart Simulation</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <div class="col-12">
+                <p>
+                    This simulation is based on census data and arrest data for Philadelphia in the year 2020. Data
+                    provided by Philly Bail Fund. The
+                    number of records used is scaled based on the selected population size.
+                    Since this is a scaled down representation of the Philadelphia population, there is a correlated
+                    number of records used which are chosen at random.
+                    <br /><br />
+                    The simulation starts on the first of january 2020, each time an arrest was made where the arrestee
+                    was unable to post bail, a person in the simulation is set as arrested
+                    and their level of negative influence is set to 100%. For 100 days after the arrest the level of
+                    influence for each family member is increase at a decreasing rate,
+                    resulting in about a 50% increase in negative influence over that time.
+                    The level of negative influence for each member of the population is set to be no less than half of
+                    whichever friend has the most negative influence.
+                </p>
+            </div>
+        </div>
+    </div>
 </body>
+
 </html>

@@ -1,27 +1,28 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+canvas.width = innerWidth * 0.985;
+canvas.height = innerHeight * 0.8;
 
 let settings = {
-    populationCount: 2000,
+    populationCount: 1000,
     jailPersonSize: {
         x: 10,
         y: 20
     },
     buffer: 20,
     startDate: new Date('2020-01-01'),
-    bottomPos: canvas.height-50,
+    bottomPos: canvas.height - 50,
     bottomBuffer: 10,
     barSpacing: 40,
-    dayDelimiter: 8,
+    dayDelimiter: 10,
     loopTime: 400
 }
 
+
 settings.personSize = {
-    x: 6000/settings.populationCount,
-    y: 12000/settings.populationCount
+    x: 6000 / settings.populationCount,
+    y: 12000 / settings.populationCount
 }
 
 let day = 0;
@@ -31,10 +32,45 @@ let population = {};
 let families = {};
 let records = [];
 let recordsToUse = [];
+let init;
 
-let init = function () {
-    setStartDate();
-    setInterval(update, 1000 / 30);
+let cityImg = new Image();
+cityImg.src = "./client/img/city.png"
+
+let houseImgs = [];
+
+for(let i=1; i<=6; i++){
+    houseImgs[i] = new Image();
+    houseImgs[i].src = "./client/img/house-" + i + ".png";
+}
+
+
+function restartSimulation() {
+
+    clearInterval(init);
+    let populationNum = document.getElementById("txtPopulation").value;
+
+    if (populationNum == "" || populationNum < 200 || populationNum > 4000) {
+        populationNum = 1000;
+    }
+
+    settings.populationCount = populationNum;
+    day = 0;
+    time = 0;
+    population = {};
+    families = {};
+    records = [];
+    recordsToUse = [];
+    loadData();
+
+    settings.personSize = {
+        x: 6000 / settings.populationCount,
+        y: 12000 / settings.populationCount
+    }
+
+    populate();
+    
+
 }
 
 function setStartDate() {
@@ -55,7 +91,7 @@ function update() {
 
     time++;
 
-    if(time%settings.dayDelimiter==0)day++;
+    if (time % settings.dayDelimiter == 0) day++;
 
 
     //arrestees affect family
@@ -70,18 +106,18 @@ function update() {
     for (let i in population) {
 
         //increment position
-        if(population[i].delay<=0){
-            if(population[i].influence==0)population[i].position++;
-            else{
+        if (population[i].delay <= 0) {
+            if (population[i].influence == 0) population[i].position++;
+            else {
                 let increment = map(population[i].influence, 0, 100, 1, 0.2);
-                if(increment>1) increment=1;
-                population[i].position+=increment;
+                if (increment > 1) increment = 1;
+                population[i].position += increment;
             }
-            if(population[i].position>=settings.loopTime) population[i].position=0;
+            if (population[i].position >= settings.loopTime) population[i].position = 0;
         } else {
             population[i].delay--;
         }
-        
+
 
         //family influence
         if (population[i].arrested) {
@@ -113,7 +149,7 @@ function update() {
     }
 
     for (let i = 0; i < recordsToUse.length; i++) {
-        if (time%settings.dayDelimiter==0 && day == recordsToUse[i].arrestDay) {
+        if (time % settings.dayDelimiter == 0 && day == recordsToUse[i].arrestDay) {
             let arrestee = getRandomPerson();
             arrestee.arrested = true;
             arrestee.influence = 100;
@@ -126,37 +162,48 @@ function update() {
 
 function draw() {
 
-    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // let x = settings.buffer;
-    // let y = settings.buffer;
+
+    ctx.globalAlpha = 0.4;
+
+    for(let i=0; i<canvas.width; i+=300){
+        ctx.drawImage(cityImg, i, -20, 300, 100);
+    }
+
+    for(let i=0; i<canvas.width; i+=80){
+        ctx.drawImage(houseImgs[(i/80)%6+1], i, settings.bottomPos-55, 80, 60);
+    }
+
     
+    ctx.globalAlpha = 1;
+
     let inJail = 0;
 
     for (let i in population) {
-        if(!population[i].arrested){
+        if (!population[i].arrested) {
             let position = Math.floor(population[i].position);
 
-            let totalDistance = settings.bottomPos - settings.bottomBuffer - settings.personSize.y;
+            let totalDistance = settings.bottomPos - settings.bottomBuffer*6 - settings.personSize.y;
 
-            if(position<settings.loopTime*0.1){
-                drawPerson(population[i].xPosition, settings.bottomPos-settings.personSize.y, population[i].influence, false);
-            } else if(position<settings.loopTime*0.5){
-                let distance = (settings.loopTime*0.4) / (population[i].position-settings.loopTime*0.1);
-                drawPerson(population[i].xPosition, settings.bottomPos - totalDistance/distance - settings.personSize.y, population[i].influence, false);
-            } else if(position<settings.loopTime*0.6){
-                drawPerson(population[i].xPosition, settings.bottomBuffer, population[i].influence, false);
+            if (position < settings.loopTime * 0.1) {
+                drawPerson(population[i].xPosition, settings.bottomPos - settings.personSize.y, population[i].influence, false);
+            } else if (position < settings.loopTime * 0.5) {
+                let distance = (settings.loopTime * 0.4) / (population[i].position - settings.loopTime * 0.1);
+                drawPerson(population[i].xPosition, settings.bottomPos - totalDistance / distance - settings.personSize.y, population[i].influence, false);
+            } else if (position < settings.loopTime * 0.6) {
+                drawPerson(population[i].xPosition, settings.bottomBuffer*6, population[i].influence, false);
             } else {
-                let distance = (settings.loopTime*0.4) / (population[i].position-settings.loopTime*0.6);
-                drawPerson(population[i].xPosition, settings.bottomBuffer + totalDistance/distance - settings.personSize.y + settings.personSize.y, population[i].influence, false);
+                let distance = (settings.loopTime * 0.4) / (population[i].position - settings.loopTime * 0.6);
+                drawPerson(population[i].xPosition, settings.bottomBuffer*6 + totalDistance / distance - settings.personSize.y + settings.personSize.y, population[i].influence, false);
             }
 
-            
-        } 
-        else{
-            drawPerson(settings.bottomBuffer + settings.barSpacing*inJail + (settings.barSpacing-settings.jailPersonSize.x)/2 , settings.bottomPos + settings.bottomBuffer - (settings.jailPersonSize.y - (canvas.height - settings.bottomBuffer-settings.bottomPos))/2, population[i].influence, true);
+
+        }
+        else {
+            drawPerson(settings.bottomBuffer + settings.barSpacing * inJail + (settings.barSpacing - settings.jailPersonSize.x) / 2, settings.bottomPos + settings.bottomBuffer - (settings.jailPersonSize.y - (canvas.height - settings.bottomBuffer - settings.bottomPos)) / 2, population[i].influence, true);
             inJail++;
-        } 
+        }
         // x += settings.personSize.x + settings.buffer;
 
         // if (x > canvas.width - settings.personSize.x - settings.buffer) {
@@ -171,7 +218,7 @@ function drawPerson(x, y, influence, jailed) {
 
     let personSize;
 
-    if(jailed){
+    if (jailed) {
         personSize = {
             x: settings.jailPersonSize.x,
             y: settings.jailPersonSize.y
@@ -206,11 +253,11 @@ function drawPerson(x, y, influence, jailed) {
 
 }
 
-function drawJail(){
+function drawJail() {
     ctx.fillStyle = 'black';
-    ctx.strokeRect(settings.bottomBuffer, settings.bottomPos + settings.bottomBuffer, canvas.width - settings.bottomBuffer*2, canvas.height - settings.bottomPos - settings.bottomBuffer*2);
+    ctx.strokeRect(settings.bottomBuffer, settings.bottomPos + settings.bottomBuffer, canvas.width - settings.bottomBuffer * 2, canvas.height - settings.bottomPos - settings.bottomBuffer * 2);
     ctx.lineWidth = 5;
-    for(let i=settings.bottomBuffer + settings.barSpacing; i < canvas.width - settings.bottomBuffer; i+=settings.barSpacing){
+    for (let i = settings.bottomBuffer + settings.barSpacing; i < canvas.width - settings.bottomBuffer; i += settings.barSpacing) {
         ctx.beginPath();
         ctx.moveTo(i, settings.bottomPos + settings.bottomBuffer);
         ctx.lineTo(i, canvas.height - settings.bottomBuffer);
@@ -231,8 +278,8 @@ function populate() {
             friends: [],
             influence: 0,
             position: 0,
-            xPosition: canvas.width/settings.populationCount*i,
-            delay: Math.floor(Math.random()*(settings.loopTime/2))
+            xPosition: canvas.width / settings.populationCount * i,
+            delay: Math.floor(Math.random() * (settings.loopTime / 2))
         }
         if (families.length == 0) {
             let newFamily = {
@@ -336,7 +383,15 @@ function map(num, in_min, in_max, out_min, out_max) {
 
 populate();
 
+
 $(document).ready(function () {
+    loadData();
+});
+
+function loadData() {
+
+    document.getElementById("btnRestart").addEventListener("click", restartSimulation);
+
     $.ajax({
         type: "GET",
         url: "client/all.csv",
@@ -346,7 +401,7 @@ $(document).ready(function () {
             alert("Status: " + xhr.status + "     Error: " + thrownError);
         }
     });
-});
+}
 
 
 function processData(data) {
@@ -388,7 +443,8 @@ function processData(data) {
 
     }
 
-    init();
+    setStartDate();
+    init = setInterval(update, 1000 / 30);
 
 }
 
